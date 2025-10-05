@@ -49,6 +49,15 @@ export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGat
                     fullName,
                     password, // this is hashed password
                     createdAt: new Date().toISOString(),
+                    watchlist: [
+                        [
+                            { name: "ethusd", address: "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419" },
+                            { name: "btcusd", address: "0xf4030086522a5beea4988f8ca5b36dbc97bee88c" },
+                        ],
+                        [],
+                        [],
+                        [],
+                    ], // creating watchlist with two initial stocks
                 },
             }),
         );

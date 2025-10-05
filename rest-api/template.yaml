@@ -22,6 +22,8 @@ Parameters:
         Type: String
     MjApiPrivateKey:
         Type: String
+    RPCURL:
+        Type: String
     Stage:
         Type: String
         Default: dev
@@ -39,6 +41,15 @@ Resources:
       Properties:
         LayerName: bcrypt
         ContentUri: layers/bcrypt
+        CompatibleRuntimes:
+          - nodejs22.x
+        RetentionPolicy: Delete
+      
+    EthersDepsLayer:
+      Type: AWS::Serverless::LayerVersion
+      Properties:
+        LayerName: ethers
+        ContentUri: layers/ethers
         CompatibleRuntimes:
           - nodejs22.x
         RetentionPolicy: Delete
@@ -159,6 +170,88 @@ Resources:
                 Sourcemap: true
                 EntryPoints:
                     - src/account-verify-user.ts
+
+    # watchlist services
+    WatchListFetchFunction:
+        Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+        Properties:
+            CodeUri: watchlist/
+            Handler: get-watchlist.lambdaHandler
+            Runtime: nodejs22.x
+            MemorySize: 128
+            Timeout: 100
+            Description: A microservice to fetch watchlist of a given user.
+            Layers:
+                - !Ref EthersDepsLayer
+            Architectures:
+                - x86_64
+            Events:
+                Auth:
+                    Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+                    Properties:
+                        RestApiId: !Ref RestApi
+                        Path: /watchlist/
+                        Method: GET
+            Policies:
+                - DynamoDBCrudPolicy:
+                      TableName: !Ref OctoTokensUserTable
+            Environment:
+                Variables:
+                    OctoTokensUserTable: !Ref OctoTokensUserTable
+                    JWT_SECRET: !Ref JwtSecretParameter
+                    STAGE: !Ref Stage
+                    RPCURL: !Ref RPCURL
+        Metadata: # Manage esbuild properties
+            BuildMethod: esbuild
+            BuildProperties:
+                Minify: true
+                Target: "es2020"
+                Sourcemap: true
+                External:
+                    - ethers
+                EntryPoints:
+                    - src/get-watchlist.ts
+
+    WatchListUpdateFunction:
+        Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+        Properties:
+            CodeUri: watchlist/
+            Handler: update-watchlist.lambdaHandler
+            Runtime: nodejs22.x
+            MemorySize: 128
+            Timeout: 100
+            Description: A microservice to update user watchlist.
+            Layers:
+                - !Ref EthersDepsLayer
+            Architectures:
+                - x86_64
+            Events:
+                Auth:
+                    Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+                    Properties:
+                        RestApiId: !Ref RestApi
+                        Path: /watchlist/
+                        Method: PUT
+            Policies:
+                - DynamoDBCrudPolicy:
+                      TableName: !Ref OctoTokensUserTable
+            Environment:
+                Variables:
+                    # Make table name accessible as environment variable from function code during execution
+                    OctoTokensUserTable: !Ref OctoTokensUserTable
+                    JWT_SECRET: !Ref JwtSecretParameter
+                    STAGE: !Ref Stage
+                    RPCURL: !Ref RPCURL
+        Metadata: # Manage esbuild properties
+            BuildMethod: esbuild
+            BuildProperties:
+                Minify: true
+                Target: "es2020"
+                Sourcemap: true
+                External:
+                    - ethers
+                EntryPoints:
+                    - src/update-watchlist.ts
 
     # dynamo db table
     OctoTokensUserTable:
