@@ -1,0 +1,177 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+    rest-api
+
+    for octo-tokens backend
+
+Globals:
+    Function:
+        Timeout: 3
+
+Parameters:
+    JwtSecretParameter:
+        Type: String
+    EmailApi:
+        Type: String
+    SenderEmail:
+        Type: String
+    SenderName:
+        Type: String
+    MjApiPublicKey:
+        Type: String
+    MjApiPrivateKey:
+        Type: String
+    Stage:
+        Type: String
+        Default: dev
+        AllowedValues:
+            - dev
+            - prod
+
+Conditions:
+    IsDev: !Equals [!Ref Stage, dev]
+    IsProd: !Equals [!Ref Stage, prod]
+
+Resources:
+    BcryptDepsLayer:
+      Type: AWS::Serverless::LayerVersion
+      Properties:
+        LayerName: bcrypt
+        ContentUri: layers/bcrypt
+        CompatibleRuntimes:
+          - nodejs22.x
+        RetentionPolicy: Delete
+
+    RestApi:
+        Type: AWS::Serverless::Api
+        Properties:
+            StageName: Prod
+            Cors:
+                AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+                AllowHeaders: "'Content-Type,Authorization,X-Amz-Date'"
+                AllowOrigin: "'*'"
+
+    # health check
+    HelloWorldFunction:
+        Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+        Properties:
+            CodeUri: hello-world/
+            Handler: app.lambdaHandler
+            Runtime: nodejs22.x
+            Architectures:
+                - x86_64
+            Events:
+                HelloWorld:
+                    Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+                    Properties:
+                        RestApiId: !Ref RestApi
+                        Path: /hello
+                        Method: get
+        Metadata: # Manage esbuild properties
+            BuildMethod: esbuild
+            BuildProperties:
+                Minify: true
+                Target: "es2020"
+                Sourcemap: true
+                EntryPoints:
+                    - src/app.ts
+
+    # auth services
+    AuthAccountFunction:
+        Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+        Properties:
+            CodeUri: auth/
+            Handler: account-user.lambdaHandler
+            Runtime: nodejs22.x
+            MemorySize: 128
+            Timeout: 100
+            Description: A auth microservice to register.
+            Layers:
+                - !Ref BcryptDepsLayer
+            Architectures:
+                - x86_64
+            Events:
+                Auth:
+                    Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+                    Properties:
+                        RestApiId: !Ref RestApi
+                        Path: /auth/account
+                        Method: POST
+            Policies:
+                - DynamoDBCrudPolicy:
+                      TableName: !Ref OctoTokensUserTable
+            Environment:
+                Variables:
+                    # Make table name accessible as environment variable from function code during execution
+                    OctoTokensUserTable: !Ref OctoTokensUserTable
+                    JWT_SECRET: !Ref JwtSecretParameter
+                    EMAIL_API: !Ref EmailApi
+                    EMAIL_SENDER_EMAIL: !Ref SenderEmail
+                    EMAIL_SENDER_NAME: !Ref SenderName
+                    MJ_APIKEY_PUBLIC: !Ref MjApiPublicKey
+                    MJ_APIKEY_PRIVATE: !Ref MjApiPrivateKey
+                    STAGE: !Ref Stage
+        Metadata: # Manage esbuild properties
+            BuildMethod: esbuild
+            BuildProperties:
+                Minify: true
+                Target: "es2020"
+                Sourcemap: true
+                External:
+                    - bcrypt
+                EntryPoints:
+                    - src/account-user.ts
+
+    AuthAccountVerifyFunction:
+        Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+        Properties:
+            CodeUri: auth/
+            Handler: account-verify-user.lambdaHandler
+            Runtime: nodejs22.x
+            MemorySize: 128
+            Timeout: 100
+            Description: A auth microservice to verify the token and register the user.
+            Architectures:
+                - x86_64
+            Events:
+                Auth:
+                    Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+                    Properties:
+                        RestApiId: !Ref RestApi
+                        Path: /auth/account-verify
+                        Method: GET
+            Policies:
+                # Give Create/Read/Update/Delete Permissions to the SampleTable
+                - DynamoDBCrudPolicy:
+                      TableName: !Ref OctoTokensUserTable
+            Environment:
+                Variables:
+                    # Make table name accessible as environment variable from function code during execution
+                    OctoTokensUserTable: !Ref OctoTokensUserTable
+                    JWT_SECRET: !Ref JwtSecretParameter
+                    STAGE: !Ref Stage
+        Metadata: # Manage esbuild properties
+            BuildMethod: esbuild
+            BuildProperties:
+                Minify: true
+                Target: "es2020"
+                Sourcemap: true
+                EntryPoints:
+                    - src/account-verify-user.ts
+
+    # dynamo db table
+    OctoTokensUserTable:
+        Type: AWS::Serverless::SimpleTable
+        Properties:
+            PrimaryKey:
+                Name: email
+                Type: String
+            ProvisionedThroughput:
+                ReadCapacityUnits: 2
+                WriteCapacityUnits: 2
+
+Outputs:
+    RestEndPoint:
+        Description: "API Gateway endpoint URL for Prod stage"
+        Value: !Sub "https://${RestApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/"
