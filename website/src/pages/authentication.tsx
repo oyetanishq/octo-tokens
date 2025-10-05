@@ -77,7 +77,7 @@ export default function Authentication() {
                 <div className="w-full max-w-lg bg-light-white border-4 border-background-dark shadow-retro p-8 md:p-12">
                     {/* Heading Section */}
                     <div className="text-center mb-8">
-                        <h1 className="text-5xl font-bold text-background-dark tracking-widest">OCTOTOCKENS</h1>
+                        <h1 className="text-5xl font-bold text-background-dark tracking-widest">OctoTokens</h1>
                         <p className="text-xl text-dark-green mt-2">RETRO TRADING TERMINAL</p>
                     </div>
 
