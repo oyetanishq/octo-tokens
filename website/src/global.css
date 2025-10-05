@@ -1,0 +1,46 @@
+@import "tailwindcss";
+@plugin "daisyui";
+
+:root {
+    --retro-green: #a3b899;
+    --off-white: #f5f5dc;
+    --light-white: #fdfdfb;
+    --dark-green: #364531;
+}
+
+@theme {
+    /* fonts */
+    --font-ubuntu: "Ubuntu Mono", monospace;
+    --font-display: "VT323", monospace;
+    --font-heading: "Press Start 2P", system-ui;
+
+    /* colors */
+    --color-retro-green: var(--retro-green);
+    --color-light-white: var(--light-white);
+    --color-background-light: var(--off-white);
+    --color-background-dark: var(--dark-green);
+    --color-text-light: var(--dark-green);
+    --color-text-dark: var(--off-white);
+
+    /* shadows */
+    --shadow-retro: 4px 4px 0px 0px var(--dark-green);
+    --shadow-retro-hover: 6px 6px 0px 0px var(--dark-green);
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+
+    letter-spacing: -0.025em;
+    background-color: var(--off-white);
+}
+
+#root {
+    min-height: 100dvh;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: start;
+}
