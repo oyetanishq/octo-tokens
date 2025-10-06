@@ -1,18 +1,35 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from "recharts";
 import { useAuthStore } from "@/store/user";
 
-const intervals = ["1d", "1h"];
-const tokens = ["ETH", "BTC", "UNI"];
+const tokens = ["ETH", "BTC", "UNI", "USDC", "USDT", "LINK", "AAVE", "ARB", "OP"];
+
+const getDateRanges = () => {
+    const ranges = [];
+    const today = new Date();
+    let end = new Date(today);
+    let start = new Date(today);
+
+    for (let i = 0; i < 10; i++) {
+        start = new Date(end);
+        start.setDate(start.getDate() - 30);
+        ranges.push([start.toISOString().split("T")[0], end.toISOString().split("T")[0]]);
+        end = new Date(start);
+    }
+
+    return ranges; // oldest to newest
+};
 
 const TokenChart = () => {
     const user = useAuthStore();
+    const intervals = useMemo(getDateRanges, []);
     const [data, setData] = useState([]);
     const [token, setToken] = useState("ETH");
-    const [interval, setIntervalOption] = useState("1d");
+    const [interval, setIntervalOption] = useState(intervals[0].join("#"));
 
     const fetchPrice = async () => {
         try {
+            const [startTime, endTime] = interval.split("#");
             const res = await fetch(`${import.meta.env.VITE_REST_API}/historical-data`, {
                 method: "POST",
                 headers: {
@@ -21,16 +38,20 @@ const TokenChart = () => {
                 },
                 body: JSON.stringify({
                     symbol: token,
-                    startTime: "2025-09-14T00:00:00Z",
-                    endTime: "2025-10-05T23:59:59Z",
-                    interval: interval,
+                    startTime: new Date(startTime),
+                    endTime: new Date(endTime),
+                    interval: "1d",
                 }),
             });
 
             if (!res.ok) throw new Error("Failed to fetch watchlist");
 
             const data = await res.json();
-            setData(data.historicalData);
+            const modifiedData = data.historicalData.map((pt: any) => {
+                return { value: pt.value, timestamp: pt.timestamp.split("T")[0] };
+            });
+
+            setData(modifiedData);
         } catch (err) {
             console.error(err);
         }
@@ -38,7 +59,7 @@ const TokenChart = () => {
 
     useEffect(() => {
         fetchPrice();
-        const intervalId = setInterval(fetchPrice, 30000); // refresh every 30s
+        const intervalId = setInterval(fetchPrice, 30 * 1000); // refresh every 30s
         return () => clearInterval(intervalId);
     }, [token, interval]);
 
@@ -55,8 +76,9 @@ const TokenChart = () => {
 
                 <select value={interval} onChange={(e) => setIntervalOption(e.target.value)}>
                     {intervals.map((i) => (
-                        <option key={i} value={i}>
-                            {i}
+                        <option key={i.join("-")} value={i.join("#")}>
+                            {new Date(i[0]).toDateString()}&ensp;to&ensp;
+                            {new Date(i[1]).toDateString()}
                         </option>
                     ))}
                 </select>
@@ -68,7 +90,7 @@ const TokenChart = () => {
                     <XAxis dataKey="timestamp" />
                     <YAxis />
                     <Tooltip />
-                    <Line type="monotone" dataKey="value" stroke="#8884d8" />
+                    <Line type="monotone" dataKey="value" stroke="#364531" />
                 </LineChart>
             </ResponsiveContainer>
         </div>
