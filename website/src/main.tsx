@@ -8,7 +8,8 @@ import { BrowserRouter, Route, Routes } from "react-router";
 import Home from "@/pages/home";
 
 import Authentication from "@/pages/authentication";
-import AccountVerification from "@/pages/account-verification";
+import AccountVerification from "@/pages/authentication/account-verification";
+import GoogleVerification from "@/pages/authentication/google-verification";
 
 import Dashboard from "@/pages/dashboard";
 import { ProtectedRoute } from "@/components/protected";
@@ -24,6 +25,7 @@ const App = () => {
                     {/* register / login in your account, and email verification */}
                     <Route path="/authentication" element={<Authentication />} />
                     <Route path="/account-verification/:token" element={<AccountVerification />} />
+                    <Route path="/google-verification/:token" element={<GoogleVerification />} />
 
                     {/* your account dashboard */}
                     <Route path="/dashboard" element={<ProtectedRoute children={<Dashboard />} />} />

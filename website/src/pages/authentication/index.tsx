@@ -19,6 +19,10 @@ export default function Authentication() {
     const [fullName, setFullName] = useState("");
     const [password, setPassword] = useState("");
 
+    const handleGoogle = async () => {
+        window.location.href = `${import.meta.env.VITE_REST_API}/auth/account/google`;
+    };
+
     const handleSubmit = async (event: FormEvent) => {
         event.preventDefault();
 
@@ -74,20 +78,19 @@ export default function Authentication() {
             <Header />
 
             <div className="flex h-full grow flex-col w-full justify-center items-center px-3">
-                <div className="w-full max-w-lg bg-light-white border-4 border-background-dark shadow-retro p-8 md:p-12">
+                <div className="w-full max-w-lg bg-light-white border-4 border-background-dark shadow-retro p-5 md:p-8">
                     {/* Heading Section */}
-                    <div className="text-center mb-8">
-                        <h1 className="text-5xl font-bold text-background-dark tracking-widest">OctoTokens</h1>
-                        <p className="text-xl text-dark-green mt-2">RETRO TRADING TERMINAL</p>
+                    <div className="text-center mb-5">
+                        <p className="text-xl text-dark-green">RETRO TRADING TERMINAL</p>
                     </div>
 
                     <div className="space-y-6">
                         {/* Login/Register Toggle Buttons */}
                         <div className="flex border-b-2 border-background-dark">
-                            <button onClick={switchToRegister} className={`cursor-pointer flex-1 py-2 text-2xl uppercase focus:outline-none transition-colors duration-300 ${!isLogin ? "bg-background-dark text-light-white" : "bg-light-white text-background-dark"}`}>
+                            <button onClick={switchToRegister} className={`cursor-pointer flex-1 py-2 text-xl uppercase focus:outline-none transition-colors duration-300 ${!isLogin ? "bg-background-dark text-light-white" : "bg-light-white text-background-dark"}`}>
                                 Register
                             </button>
-                            <button onClick={switchToLogin} className={`cursor-pointer flex-1 py-2 text-2xl uppercase focus:outline-none transition-colors duration-300 ${isLogin ? "bg-background-dark text-light-white" : "bg-light-white text-background-dark"}`}>
+                            <button onClick={switchToLogin} className={`cursor-pointer flex-1 py-2 text-xl uppercase focus:outline-none transition-colors duration-300 ${isLogin ? "bg-background-dark text-light-white" : "bg-light-white text-background-dark"}`}>
                                 Login
                             </button>
                         </div>
@@ -96,11 +99,11 @@ export default function Authentication() {
                             // Login Form
                             <form className="space-y-6" onSubmit={handleSubmit}>
                                 <div>
-                                    <label className="block text-xl text-dark-green mb-2" htmlFor="login-email">
+                                    <label className="block text-xl text-dark-green mb-1" htmlFor="login-email">
                                         EMAIL:
                                     </label>
                                     <input
-                                        className="bg-light-white border-2 border-background-dark text-dark-green py-3 px-4 w-full text-xl outline-none shadow-[4px_4px_0px_#00000020] focus:border-background-dark focus:shadow-[0_0_0_2px_#588157]"
+                                        className="bg-light-white border-2 border-background-dark text-dark-green py-2.5 px-4 w-full text-xl outline-none shadow-[4px_4px_0px_#00000020] focus:border-background-dark focus:shadow-[0_0_0_2px_#588157]"
                                         minLength={3}
                                         maxLength={50}
                                         name="username"
@@ -111,11 +114,11 @@ export default function Authentication() {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-xl text-dark-green mb-2" htmlFor="register-password">
+                                    <label className="block text-xl text-dark-green mb-1" htmlFor="register-password">
                                         PASSWORD:
                                     </label>
                                     <input
-                                        className="bg-light-white border-2 border-background-dark text-dark-green py-3 px-4 w-full text-xl outline-none shadow-[4px_4px_0px_#00000020] focus:border-background-dark focus:shadow-[0_0_0_2px_#588157]"
+                                        className="bg-light-white border-2 border-background-dark text-dark-green py-2.5 px-4 w-full text-xl outline-none shadow-[4px_4px_0px_#00000020] focus:border-background-dark focus:shadow-[0_0_0_2px_#588157]"
                                         required
                                         minLength={6}
                                         maxLength={40}
@@ -136,13 +139,13 @@ export default function Authentication() {
                             </form>
                         ) : (
                             // Registration Form
-                            <form className="space-y-6" onSubmit={handleSubmit}>
+                            <form className="space-y-4" onSubmit={handleSubmit}>
                                 <div>
-                                    <label className="block text-xl text-dark-green mb-2" htmlFor="register-name">
+                                    <label className="block text-xl text-dark-green mb-1" htmlFor="register-name">
                                         FULL NAME:
                                     </label>
                                     <input
-                                        className="bg-light-white border-2 border-background-dark text-dark-green py-3 px-4 w-full text-xl outline-none shadow-[4px_4px_0px_#00000020] focus:border-background-dark focus:shadow-[0_0_0_2px_#588157]"
+                                        className="bg-light-white border-2 border-background-dark text-dark-green py-2.5 px-4 w-full text-xl outline-none shadow-[4px_4px_0px_#00000020] focus:border-background-dark focus:shadow-[0_0_0_2px_#588157]"
                                         required
                                         minLength={3}
                                         maxLength={40}
@@ -153,11 +156,11 @@ export default function Authentication() {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-xl text-dark-green mb-2" htmlFor="register-email">
+                                    <label className="block text-xl text-dark-green mb-1" htmlFor="register-email">
                                         EMAIL:
                                     </label>
                                     <input
-                                        className="bg-light-white border-2 border-background-dark text-dark-green py-3 px-4 w-full text-xl outline-none shadow-[4px_4px_0px_#00000020] focus:border-background-dark focus:shadow-[0_0_0_2px_#588157]"
+                                        className="bg-light-white border-2 border-background-dark text-dark-green py-2.5 px-4 w-full text-xl outline-none shadow-[4px_4px_0px_#00000020] focus:border-background-dark focus:shadow-[0_0_0_2px_#588157]"
                                         required
                                         name="username"
                                         minLength={3}
@@ -169,11 +172,11 @@ export default function Authentication() {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-xl text-dark-green mb-2" htmlFor="register-password">
+                                    <label className="block text-xl text-dark-green mb-1" htmlFor="register-password">
                                         PASSWORD:
                                     </label>
                                     <input
-                                        className="bg-light-white border-2 border-background-dark text-dark-green py-3 px-4 w-full text-xl outline-none shadow-[4px_4px_0px_#00000020] focus:border-background-dark focus:shadow-[0_0_0_2px_#588157]"
+                                        className="bg-light-white border-2 border-background-dark text-dark-green py-2.5 px-4 w-full text-xl outline-none shadow-[4px_4px_0px_#00000020] focus:border-background-dark focus:shadow-[0_0_0_2px_#588157]"
                                         required
                                         minLength={6}
                                         maxLength={40}
@@ -196,6 +199,21 @@ export default function Authentication() {
 
                         {error && <span className="flex flex-1 justify-center items-center text-red-800">error: {error}</span>}
                         {message && <span className="flex flex-1 justify-center items-center text-green-800">message: {message}</span>}
+
+                        <div className="w-full flex justify-center items-center gap-4">
+                            <div className="w-1/2 h-px border"></div>
+                            <span>OR</span>
+                            <div className="w-1/2 h-px border"></div>
+                        </div>
+
+                        <button
+                            className="w-full h-14 flex justify-center items-center bg-retro-green text-dark-green border-2 border-background-dark py-3 px-4 text-xl uppercase cursor-pointer shadow-retro-hover transition-all duration-100 ease-in-out hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-retro active:translate-x-[4px] active:translate-y-[4px] active:shadow-[0px_0px_0px_#00000040]"
+                            type="button"
+                            onClick={handleGoogle}
+                        >
+                            {isLoading ? <Loader className="size-5 animate-spin" /> : isLogin ? "Login with google" : "register with google"}
+                            {!isLoading && <img src="/google-icon.png" alt="google icon" className="h-7" />}
+                        </button>
                     </div>
                 </div>
             </div>
