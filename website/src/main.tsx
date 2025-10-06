@@ -13,6 +13,7 @@ import GoogleVerification from "@/pages/authentication/google-verification";
 
 import Dashboard from "@/pages/dashboard";
 import { ProtectedRoute } from "@/components/protected";
+import NotFound from "./pages/not-found";
 
 const App = () => {
     return (
@@ -29,6 +30,9 @@ const App = () => {
 
                     {/* your account dashboard */}
                     <Route path="/dashboard" element={<ProtectedRoute children={<Dashboard />} />} />
+
+                    {/* not found page */}
+                    <Route path="*" element={<NotFound />} />
                 </Routes>
             </BrowserRouter>
         </StrictMode>
