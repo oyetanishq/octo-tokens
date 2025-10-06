@@ -22,6 +22,12 @@ Parameters:
         Type: String
     MjApiPrivateKey:
         Type: String
+    GoogleClientId:
+        Type: String
+    GoogleClientSecret:
+        Type: String
+    GoogleRedirectUrl:
+        Type: String
     RPCURL:
         Type: String
     ALCAPIKEY:
@@ -39,22 +45,22 @@ Conditions:
 
 Resources:
     BcryptDepsLayer:
-      Type: AWS::Serverless::LayerVersion
-      Properties:
-        LayerName: bcrypt
-        ContentUri: layers/bcrypt
-        CompatibleRuntimes:
-          - nodejs22.x
-        RetentionPolicy: Delete
-      
+        Type: AWS::Serverless::LayerVersion
+        Properties:
+            LayerName: bcrypt
+            ContentUri: layers/bcrypt
+            CompatibleRuntimes:
+                - nodejs22.x
+            RetentionPolicy: Delete
+
     EthersDepsLayer:
-      Type: AWS::Serverless::LayerVersion
-      Properties:
-        LayerName: ethers
-        ContentUri: layers/ethers
-        CompatibleRuntimes:
-          - nodejs22.x
-        RetentionPolicy: Delete
+        Type: AWS::Serverless::LayerVersion
+        Properties:
+            LayerName: ethers
+            ContentUri: layers/ethers
+            CompatibleRuntimes:
+                - nodejs22.x
+            RetentionPolicy: Delete
 
     RestApi:
         Type: AWS::Serverless::Api
@@ -90,7 +96,7 @@ Resources:
                 EntryPoints:
                     - src/app.ts
 
-    # auth services
+    # auth services (email)
     AuthAccountFunction:
         Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
         Properties:
@@ -164,6 +170,7 @@ Resources:
                     OctoTokensUserTable: !Ref OctoTokensUserTable
                     JWT_SECRET: !Ref JwtSecretParameter
                     STAGE: !Ref Stage
+
         Metadata: # Manage esbuild properties
             BuildMethod: esbuild
             BuildProperties:
@@ -172,6 +179,80 @@ Resources:
                 Sourcemap: true
                 EntryPoints:
                     - src/account-verify-user.ts
+
+    # auth service (google)
+    AuthGoogleRedirectFunction:
+        Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+        Properties:
+            CodeUri: auth/
+            Handler: google-redirect.lambdaHandler
+            Runtime: nodejs22.x
+            MemorySize: 128
+            Timeout: 100
+            Description: A auth microservice to verify the token and register the user.
+            Architectures:
+                - x86_64
+            Events:
+                Auth:
+                    Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+                    Properties:
+                        RestApiId: !Ref RestApi
+                        Path: /auth/account/google
+                        Method: GET
+            Environment:
+                Variables:
+                    STAGE: !Ref Stage
+                    GoogleClientId: !Ref GoogleClientId
+                    GoogleClientSecret: !Ref GoogleClientSecret
+                    GoogleRedirectUrl: !Ref GoogleRedirectUrl
+
+        Metadata: # Manage esbuild properties
+            BuildMethod: esbuild
+            BuildProperties:
+                Minify: true
+                Target: "es2020"
+                Sourcemap: true
+                EntryPoints:
+                    - src/google-redirect.ts 
+
+    AuthGoogleCallbackFunction:
+        Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+        Properties:
+            CodeUri: auth/
+            Handler: google-callback.lambdaHandler
+            Runtime: nodejs22.x
+            MemorySize: 128
+            Timeout: 100
+            Description: A auth microservice to verify the token and register the user.
+            Architectures:
+                - x86_64
+            Events:
+                Auth:
+                    Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+                    Properties:
+                        RestApiId: !Ref RestApi
+                        Path: /auth/account/google/callback
+                        Method: GET
+            Policies:
+                - DynamoDBCrudPolicy:
+                      TableName: !Ref OctoTokensUserTable
+            Environment:
+                Variables:
+                    OctoTokensUserTable: !Ref OctoTokensUserTable
+                    JWT_SECRET: !Ref JwtSecretParameter
+                    STAGE: !Ref Stage
+                    GoogleClientId: !Ref GoogleClientId
+                    GoogleClientSecret: !Ref GoogleClientSecret
+                    GoogleRedirectUrl: !Ref GoogleRedirectUrl
+
+        Metadata: # Manage esbuild properties
+            BuildMethod: esbuild
+            BuildProperties:
+                Minify: true
+                Target: "es2020"
+                Sourcemap: true
+                EntryPoints:
+                    - src/google-callback.ts
 
     # watchlist services
     WatchListFetchFunction:
