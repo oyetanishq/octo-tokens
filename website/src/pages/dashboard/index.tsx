@@ -2,6 +2,7 @@ import WatchList from "@/pages/dashboard/watchlist";
 import { useAuthStore } from "@/store/user";
 import { Noise } from "@/components/noise";
 import Header from "@/components/header";
+import PriceChart from "./graph";
 
 export default function Dashboard() {
     const { user } = useAuthStore();
@@ -14,8 +15,9 @@ export default function Dashboard() {
             <Header />
 
             {/* main section */}
-            <main className="flex flex-1 flex-col md:flex-row">
+            <main className="flex flex-1 flex-col md:flex-row h-auto">
                 <WatchList />
+                <PriceChart />
             </main>
 
             {/* noise in page */}

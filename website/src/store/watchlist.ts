@@ -57,7 +57,6 @@ export const useWatchlistStore = create<WatchlistStore>((set) => ({
             if (!res.ok) throw new Error("Failed to fetch watchlist");
 
             const data = await res.json();
-            console.log(data);
 
             set({ watchlist: data["watchlist"], isFetching: false });
         } catch (err: any) {

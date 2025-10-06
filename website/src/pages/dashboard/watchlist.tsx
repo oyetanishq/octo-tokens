@@ -44,7 +44,7 @@ export default function WatchList() {
         );
 
     return (
-        <div className="flex-1 md:h-auto flex flex-col w-full md:max-w-md p-3 relative border-b md:border-b-0 md:border-r">
+        <div className="h-full md:h-auto flex flex-col w-full md:max-w-md p-3 relative border-b md:border-b-0 md:border-r">
             {isFetching && (
                 <div className="absolute top-0 left-0 bottom-0 right-0 flex justify-center items-center gap-2 z-50 backdrop-blur-xs">
                     <Loader className="size-4 animate-spin" />
