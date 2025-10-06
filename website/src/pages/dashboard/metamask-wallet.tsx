@@ -54,7 +54,10 @@ export default function MetaMaskWallet() {
     return (
         <div className="mt-10 w-full px-4 md:px-10">
             {accounts.length === 0 && (
-                <button onClick={connectWallet} className="btn btn-primary">
+                <button
+                    onClick={connectWallet}
+                    className="flex h-10 w-full cursor-pointer items-center justify-center overflow-hidden border-2 border-dark-green bg-retro-green px-7 text-md font-bold text-dark-green shadow-retro transition-all hover:shadow-retro-hover active:shadow-retro-hover truncate"
+                >
                     Connect MetaMask
                 </button>
             )}

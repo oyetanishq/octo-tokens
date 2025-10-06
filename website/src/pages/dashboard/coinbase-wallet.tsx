@@ -52,7 +52,10 @@ export default function CoinbaseWallet() {
     return (
         <div className="my-4 w-full px-4 md:px-10">
             {accounts.length === 0 && (
-                <button onClick={connectWallet} className="btn btn-info">
+                <button
+                    onClick={connectWallet}
+                    className="flex h-10 w-full cursor-pointer items-center justify-center overflow-hidden border-2 border-dark-green bg-retro-green px-7 text-md font-bold text-dark-green shadow-retro transition-all hover:shadow-retro-hover active:shadow-retro-hover truncate"
+                >
                     Connect Coinbase Wallet
                 </button>
             )}

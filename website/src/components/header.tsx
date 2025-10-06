@@ -34,14 +34,14 @@ export default function Header() {
                     </Link>
                     {user ? (
                         <button
-                            className="flex h-10 w-full cursor-pointer items-center justify-center overflow-hidden border-2 border-dark-green bg-retro-green px-7 text-sm font-bold text-dark-green shadow-retro transition-all hover:shadow-retro-hover active:shadow-retro-hover truncate "
+                            className="flex h-10 w-full cursor-pointer items-center justify-center overflow-hidden border-2 border-dark-green bg-retro-green px-7 text-sm font-bold text-dark-green shadow-retro transition-all hover:shadow-retro-hover active:shadow-retro-hover truncate"
                             onClick={logout}
                         >
                             Logout
                         </button>
                     ) : (
                         <Link
-                            className="flex h-10 w-full cursor-pointer items-center justify-center overflow-hidden border-2 border-dark-green bg-retro-green px-7 text-sm font-bold text-dark-green shadow-retro transition-all hover:shadow-retro-hover active:shadow-retro-hover truncate "
+                            className="flex h-10 w-full cursor-pointer items-center justify-center overflow-hidden border-2 border-dark-green bg-retro-green px-7 text-sm font-bold text-dark-green shadow-retro transition-all hover:shadow-retro-hover active:shadow-retro-hover truncate"
                             to="/authentication"
                         >
                             Login
