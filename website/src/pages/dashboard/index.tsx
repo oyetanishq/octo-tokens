@@ -3,6 +3,8 @@ import { useAuthStore } from "@/store/user";
 import { Noise } from "@/components/noise";
 import Header from "@/components/header";
 import PriceChart from "./graph";
+import MetaMaskWallet from "./metamask-wallet";
+import CoinbaseWallet from "./coinbase-wallet";
 
 export default function Dashboard() {
     const { user } = useAuthStore();
@@ -17,7 +19,11 @@ export default function Dashboard() {
             {/* main section */}
             <main className="flex flex-1 flex-col md:flex-row h-auto">
                 <WatchList />
-                <PriceChart />
+                <div className="w-full flex flex-col justify-center items-center overflow-y-scroll">
+                    <PriceChart />
+                    <MetaMaskWallet />
+                    <CoinbaseWallet />
+                </div>
             </main>
 
             {/* noise in page */}
