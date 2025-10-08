@@ -4,6 +4,7 @@
 <img width="1566" height="1018" alt="image" src="https://github.com/user-attachments/assets/44e307c0-d5b6-41f6-b0ab-c7427163eb48" />
 
 check it out here: [octotokens.tanishqsingh.com](https://octotokens.tanishqsingh.com)
+youtube demo: [https://youtu.be/BS7rkuXUbJ4](https://youtu.be/BS7rkuXUbJ4)
 
 ### features
 - highly scalable frontend/backend
